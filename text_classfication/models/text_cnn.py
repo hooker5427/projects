@@ -4,6 +4,22 @@ from tensorflow.keras.layers import Input, Flatten, Dropout, Embedding, Conv1D, 
 from config import  *
 
 
+optimizer = tf.keras.optimizers.Adam()
+loss_object = tf.keras.losses.CategoricalCrossentropy(from_logits=True)
+
+
+def loss_function(real, pred):
+    mask = tf.math.logical_not(tf.math.equal(real, 0))
+    loss_ = loss_object(real, pred)
+
+    mask = tf.cast(mask, dtype=loss_.dtype)
+    loss_ *= mask
+
+    return tf.reduce_mean(loss_)
+
+
+
+
 def build_text_cnn( x_train , embedding_matrix ):
 
     main_input = Input(shape=(max_length), dtype='float64')
@@ -25,11 +41,11 @@ def build_text_cnn( x_train , embedding_matrix ):
     cnn = tf.keras.layers.concatenate([cnn1, cnn2, cnn3], axis=1)
     flat = Flatten()(cnn)
     drop = Dropout(0.2)(flat)
-    main_output = Dense(10, activation='softmax')(drop)
+    main_output = Dense(10 )(drop)
     model = Model(inputs=main_input, outputs=main_output)
-    model.compile(loss='categorical_crossentropy',
-                  optimizer='adam',
-                  metrics=['accuracy'])
+    model.compile(loss= loss_function ,
+                  optimizer= optimizer ,
+                  metrics=['accuracy']  )
 
     model.summary()
 

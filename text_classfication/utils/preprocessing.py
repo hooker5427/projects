@@ -138,3 +138,5 @@ def process_file(filename, word_to_id, cat_to_id, max_length=600):
     y_pad = keras.utils.to_categorical(label_id)
     return x_pad, y_pad
 
+
+
